@@ -115,13 +115,24 @@ export const LessonRunner: React.FC<LessonRunnerProps> = ({
 };
 
 const renderStep = (step: LessonStep, onComplete: () => void) => {
-    switch (step.type) {
-        case 'explanation': return <Explanation step={step} onComplete={onComplete} />;
-        case 'flashcards': return <Flashcards step={step} onComplete={onComplete} />;
-        case 'quiz': return <Quiz step={step} onComplete={onComplete} />;
+    // Normalize: GPT sometimes uses underscores or spaces instead of hyphens
+    const type = step.type.replace(/[_ ]/g, '-').toLowerCase();
+
+    switch (type) {
+        case 'explanation': return <Explanation step={step as any} onComplete={onComplete} />;
+        case 'flashcards': return <Flashcards step={step as any} onComplete={onComplete} />;
+        case 'quiz': return <Quiz step={step as any} onComplete={onComplete} />;
         case 'matching': return <Matching step={step as any} onComplete={onComplete} />;
-        case 'fill-in-the-blank': return <FillInTheBlank step={step} onComplete={onComplete} />;
-        case 'short-answer': return <ShortAnswer step={step} onComplete={onComplete} />;
-        default: return <div>Unknown step type</div>;
+        case 'fill-in-the-blank': return <FillInTheBlank step={step as any} onComplete={onComplete} />;
+        case 'short-answer': return <ShortAnswer step={step as any} onComplete={onComplete} />;
+        default:
+            console.warn('Unknown step type:', step.type);
+            // Skip unknown steps automatically
+            return (
+                <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', maxWidth: '42rem', width: '100%', margin: '0 auto' }}>
+                    <p style={{ opacity: 0.5, marginBottom: '1rem' }}>Step type "{step.type}" not supported</p>
+                    <button className="btn" onClick={onComplete}>Skip →</button>
+                </div>
+            );
     }
 };
