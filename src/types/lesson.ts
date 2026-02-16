@@ -1,4 +1,4 @@
-export type LessonStepType = 'explanation' | 'flashcards' | 'quiz' | 'matching';
+export type LessonStepType = 'explanation' | 'flashcards' | 'quiz' | 'matching' | 'fill-in-the-blank' | 'short-answer';
 
 export interface BaseStep {
     id: string;
@@ -44,7 +44,35 @@ export interface MatchingStep extends BaseStep {
     pairs: MatchPair[];
 }
 
-export type LessonStep = ExplanationStep | FlashcardsStep | QuizStep | MatchingStep;
+export interface FillInTheBlankStep extends BaseStep {
+    type: 'fill-in-the-blank';
+    /** The sentence with ___BLANK___ marking where the answer goes */
+    sentence: string;
+    /** The correct answer to fill in the blank */
+    correctAnswer: string;
+    /** Distractor options (including the correct answer shuffled in) */
+    options: string[];
+    /** Brief explanation shown after answering */
+    explanation: string;
+}
+
+export interface KeyPoint {
+    point: string;
+    marks: number;
+}
+
+export interface ShortAnswerStep extends BaseStep {
+    type: 'short-answer';
+    question: string;
+    /** Model answer for display after submission */
+    modelAnswer: string;
+    /** Key points the student should mention, each worth marks */
+    keyPoints: KeyPoint[];
+    /** Total marks available (sum of all keyPoint marks) */
+    totalMarks: number;
+}
+
+export type LessonStep = ExplanationStep | FlashcardsStep | QuizStep | MatchingStep | FillInTheBlankStep | ShortAnswerStep;
 
 export interface Lesson {
     title: string;

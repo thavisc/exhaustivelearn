@@ -38,28 +38,35 @@ You are an elite university-level curriculum designer. Your job is to create an 
 
 ## CRITICAL RULES:
 1. DO NOT SKIP ANYTHING. Every paragraph, every concept, every definition, every example in the source text must be covered.
-2. The lesson must have MANY steps (aim for 30-60+ steps). A short lesson is a FAILURE.
+2. The lesson must have MANY steps (aim for 40-70+ steps). A short lesson is a FAILURE.
 3. Follow this pattern for EACH major concept:
    - First, an "explanation" step teaching the concept thoroughly
    - Then, a "flashcards" step with ALL key terms from that section (5-10 cards per deck)
    - Then, a "quiz" step testing understanding (4 options each)
+   - Then, a "fill-in-the-blank" step for key definitions or facts
    - Optionally, a "matching" step to reinforce connections (4-6 pairs)
+   - Optionally, a "short-answer" step for deeper understanding (2-4 key points, 1 mark each)
 4. After covering all individual topics, add a FINAL REVIEW section with:
    - A comprehensive flashcard deck of ALL major terms
    - Multiple challenging quiz questions that test cross-topic understanding
    - A matching exercise connecting concepts from different sections
+   - 2-3 short-answer questions that test synthesis across topics
 5. Explanation content should be DETAILED markdown — use bullet points, bold terms, examples. Do NOT summarize; teach in full depth.
 6. Quiz questions should have 4 options, not 2. Make wrong options plausible.
 7. Flashcard decks should have at minimum 5 cards each.
+8. Fill-in-the-blank: Use ___BLANK___ in the sentence. Provide 4-5 options (1 correct + 3-4 distractors). Distractors should be plausible but wrong.
+9. Short-answer: Ask questions that require explaining a concept. Provide a model answer and break it into key points (each worth 1 mark). Aim for 2-4 key points per question.
 
-## JSON FORMAT:
+## STEP TYPES AND JSON FORMAT:
 {
   "title": "Lesson Title",
   "steps": [
     { "id": "1", "type": "explanation", "title": "Section Title", "content": "Detailed markdown explanation..." },
     { "id": "2", "type": "flashcards", "title": "Key Terms", "deck": [{ "front": "Term", "back": "Full definition" }, ...] },
     { "id": "3", "type": "quiz", "title": "Check Understanding", "question": "Question text", "options": ["A", "B", "C", "D"], "correctAnswerIndex": 0, "explanation": "Why this is correct..." },
-    { "id": "4", "type": "matching", "title": "Match Concepts", "pairs": [{ "left": "Term", "right": "Definition" }, ...] }
+    { "id": "4", "type": "matching", "title": "Match Concepts", "pairs": [{ "left": "Term", "right": "Definition" }, ...] },
+    { "id": "5", "type": "fill-in-the-blank", "title": "Complete the Definition", "sentence": "A ___BLANK___ is a data structure that follows Last-In-First-Out ordering.", "correctAnswer": "stack", "options": ["stack", "queue", "array", "tree"], "explanation": "A stack uses LIFO ordering." },
+    { "id": "6", "type": "short-answer", "title": "Explain the Concept", "question": "Explain how inheritance works in OOP and why it is useful.", "modelAnswer": "Inheritance allows a class to inherit properties and methods from a parent class. This promotes code reuse and establishes an is-a relationship between classes.", "keyPoints": [{ "point": "Inherits properties and methods from parent class", "marks": 1 }, { "point": "Promotes code reuse", "marks": 1 }, { "point": "Establishes is-a relationship", "marks": 1 }], "totalMarks": 3 }
   ]
 }
 
@@ -69,7 +76,7 @@ ${extractedText.substring(0, 80000)}
 
                 const completion = await openaiRef.current!.chat.completions.create({
                     messages: [
-                        { role: 'system', content: 'You are a JSON generator. Output ONLY valid JSON. Your goal is to create the most thorough, exhaustive lesson possible. Never summarize — always teach in full detail. The lesson MUST have 30+ steps.' },
+                        { role: 'system', content: 'You are a JSON generator. Output ONLY valid JSON. Your goal is to create the most thorough, exhaustive lesson possible. Never summarize — always teach in full detail. The lesson MUST have 40+ steps. Use ALL step types: explanation, flashcards, quiz, fill-in-the-blank, matching, and short-answer.' },
                         { role: 'user', content: prompt }
                     ],
                     model: 'gpt-4o',

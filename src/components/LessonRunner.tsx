@@ -4,6 +4,8 @@ import { Explanation } from './lesson/Explanation';
 import { Flashcards } from './lesson/Flashcards';
 import { Quiz } from './lesson/Quiz';
 import { Matching } from './lesson/Matching';
+import { FillInTheBlank } from './lesson/FillInTheBlank';
+import { ShortAnswer } from './lesson/ShortAnswer';
 
 interface LessonRunnerProps {
     lesson: Lesson;
@@ -118,6 +120,8 @@ const renderStep = (step: LessonStep, onComplete: () => void) => {
         case 'flashcards': return <Flashcards step={step} onComplete={onComplete} />;
         case 'quiz': return <Quiz step={step} onComplete={onComplete} />;
         case 'matching': return <Matching step={step as any} onComplete={onComplete} />;
+        case 'fill-in-the-blank': return <FillInTheBlank step={step} onComplete={onComplete} />;
+        case 'short-answer': return <ShortAnswer step={step} onComplete={onComplete} />;
         default: return <div>Unknown step type</div>;
     }
 };
