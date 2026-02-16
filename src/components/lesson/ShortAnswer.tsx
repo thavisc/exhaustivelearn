@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { ShortAnswerStep } from '../../types/lesson';
 
 interface ShortAnswerProps {
@@ -12,7 +12,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({ step, onComplete }) =>
     const [matchedPoints, setMatchedPoints] = useState<boolean[]>([]);
     const [score, setScore] = useState(0);
 
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         if (!answer.trim()) return;
 
         // Simple keyword matching — check if user's answer mentions each key point
@@ -34,11 +34,32 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({ step, onComplete }) =>
         const totalScore = results.reduce((sum, matched, i) => sum + (matched ? step.keyPoints[i].marks : 0), 0);
         setScore(totalScore);
         setIsSubmitted(true);
-    };
+    }, [answer, step.keyPoints]);
 
     const handleSkip = () => {
         onComplete();
     };
+
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            // Don't trigger shortcuts while typing in textarea
+            if (document.activeElement?.tagName === 'TEXTAREA') return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isSubmitted) {
+                    onComplete();
+                } else if (answer.trim()) {
+                    handleSubmit();
+                } else {
+                    // Skip if no answer typed
+                    onComplete();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [isSubmitted, answer, handleSubmit, onComplete]);
 
     const scorePercent = step.totalMarks > 0 ? Math.round((score / step.totalMarks) * 100) : 0;
     const scoreColor = scorePercent >= 70 ? '#22c55e' : scorePercent >= 40 ? '#f59e0b' : '#ef4444';

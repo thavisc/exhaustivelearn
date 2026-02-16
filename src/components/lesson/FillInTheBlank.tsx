@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import type { FillInTheBlankStep } from '../../types/lesson';
 
 interface FillInTheBlankProps {
@@ -25,11 +25,32 @@ export const FillInTheBlank: React.FC<FillInTheBlankProps> = ({ step, onComplete
         setSelectedOption(option);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         if (selectedOption && !isSubmitted) {
             setIsSubmitted(true);
         }
-    };
+    }, [selectedOption, isSubmitted]);
+
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            const num = parseInt(e.key);
+            if (num >= 1 && num <= Math.min(4, shuffledOptions.length) && !isSubmitted) {
+                e.preventDefault();
+                setSelectedOption(shuffledOptions[num - 1]);
+                return;
+            }
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isSubmitted) {
+                    onComplete();
+                } else if (selectedOption) {
+                    handleSubmit();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [shuffledOptions, isSubmitted, selectedOption, handleSubmit, onComplete]);
 
     const getOptionStyle = (option: string): React.CSSProperties => {
         const base: React.CSSProperties = {
