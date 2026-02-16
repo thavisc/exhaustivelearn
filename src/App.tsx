@@ -122,68 +122,73 @@ function App() {
                 key={saved.id}
                 className="glass-panel"
                 style={{
-                    padding: '0.85rem 1rem', cursor: 'pointer', transition: 'all 0.2s',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem',
+                    padding: '0.75rem', cursor: 'pointer', transition: 'all 0.2s',
                 }}
                 onClick={() => !isEditing && !isMoving && handleResumeLesson(saved)}
             >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    {isEditing ? (
-                        <input autoFocus value={editingName}
-                            onChange={(e) => setEditingName(e.target.value)}
-                            onBlur={() => handleFinishRename(saved.id)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') handleFinishRename(saved.id); if (e.key === 'Escape') setEditingId(null); }}
-                            onClick={(e) => e.stopPropagation()}
-                            style={{
-                                background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(59,130,246,0.5)',
-                                borderRadius: '6px', padding: '0.3rem 0.5rem', color: 'inherit',
-                                fontSize: '0.95rem', fontWeight: 600, width: '100%', outline: 'none',
-                            }}
-                        />
-                    ) : (
-                        <div style={{ fontWeight: 600, fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {saved.displayName || saved.lesson.title}
+                {/* Top row: name + action buttons */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        {isEditing ? (
+                            <input autoFocus value={editingName}
+                                onChange={(e) => setEditingName(e.target.value)}
+                                onBlur={() => handleFinishRename(saved.id)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleFinishRename(saved.id); if (e.key === 'Escape') setEditingId(null); }}
+                                onClick={(e) => e.stopPropagation()}
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(59,130,246,0.5)',
+                                    borderRadius: '6px', padding: '0.25rem 0.5rem', color: 'inherit',
+                                    fontSize: '0.9rem', fontWeight: 600, width: '100%', outline: 'none',
+                                }}
+                            />
+                        ) : (
+                            <div style={{ fontWeight: 600, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {saved.displayName || saved.lesson.title}
+                            </div>
+                        )}
+                        <div style={{ fontSize: '0.7rem', opacity: 0.5, display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginTop: '0.15rem' }}>
+                            <span>{saved.lesson.steps.length} steps</span>
+                            <span>•</span>
+                            <span>{saved.isComplete ? '✅ Done' : `${saved.currentStepIndex + 1}/${saved.lesson.steps.length}`}</span>
+                            {saved.cost !== null && (<><span>•</span><span style={{ color: '#fbbf24' }}>{formatCost(saved.cost)}</span></>)}
                         </div>
-                    )}
-                    <div style={{ fontSize: '0.75rem', opacity: 0.5, display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.2rem' }}>
-                        <span>{saved.lesson.steps.length} steps</span>
-                        <span>•</span>
-                        <span>{saved.isComplete ? '✅ Done' : `${saved.currentStepIndex + 1}/${saved.lesson.steps.length}`}</span>
-                        {saved.cost !== null && (<><span>•</span><span style={{ color: '#fbbf24' }}>{formatCost(saved.cost)}</span></>)}
                     </div>
-                    <div style={{ width: '100%', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '1px', marginTop: '0.4rem', overflow: 'hidden' }}>
-                        <div style={{ width: `${progress}%`, height: '100%', background: saved.isComplete ? '#22c55e' : 'linear-gradient(to right, #3b82f6, #8b5cf6)', borderRadius: '1px' }} />
+                    <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
+                        <button className="btn" style={{ fontSize: '0.65rem', padding: '0.3rem 0.4rem', background: 'rgba(255,255,255,0.06)', minWidth: '32px' }}
+                            onClick={(e) => { e.stopPropagation(); setMovingLessonId(isMoving ? null : saved.id); }} title="Move">📁</button>
+                        <button className="btn" style={{ fontSize: '0.65rem', padding: '0.3rem 0.4rem', background: 'rgba(255,255,255,0.06)', minWidth: '32px' }}
+                            onClick={(e) => handleStartRename(saved, e)} title="Rename">✏️</button>
+                        <button className="btn" style={{ fontSize: '0.65rem', padding: '0.3rem 0.5rem' }}
+                            onClick={(e) => { e.stopPropagation(); handleResumeLesson(saved); }}>
+                            {saved.isComplete ? 'Review' : 'Resume'}
+                        </button>
+                        <button className="btn" style={{ fontSize: '0.65rem', padding: '0.3rem 0.4rem', background: 'rgba(239,68,68,0.15)', color: '#fca5a5', minWidth: '28px' }}
+                            onClick={(e) => handleDeleteLesson(saved.id, e)}>✕</button>
                     </div>
+                </div>
 
-                    {isMoving && (
-                        <div onClick={(e) => e.stopPropagation()} style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                            <button onClick={() => handleMoveLesson(saved.id, null)} style={{
-                                fontSize: '0.7rem', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer',
-                                background: saved.folder === null ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.08)',
+                {/* Progress bar */}
+                <div style={{ width: '100%', height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '1px', marginTop: '0.4rem', overflow: 'hidden' }}>
+                    <div style={{ width: `${progress}%`, height: '100%', background: saved.isComplete ? '#22c55e' : 'linear-gradient(to right, #3b82f6, #8b5cf6)', borderRadius: '1px' }} />
+                </div>
+
+                {/* Move-to-folder picker */}
+                {isMoving && (
+                    <div onClick={(e) => e.stopPropagation()} style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                        <button onClick={() => handleMoveLesson(saved.id, null)} style={{
+                            fontSize: '0.7rem', padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer',
+                            background: saved.folder === null ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.1)', color: 'inherit',
+                        }}>📋 Unfiled</button>
+                        {folders.map(f => (
+                            <button key={f} onClick={() => handleMoveLesson(saved.id, f)} style={{
+                                fontSize: '0.7rem', padding: '0.3rem 0.5rem', borderRadius: '4px', cursor: 'pointer',
+                                background: saved.folder === f ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.08)',
                                 border: '1px solid rgba(255,255,255,0.1)', color: 'inherit',
-                            }}>📋 Unfiled</button>
-                            {folders.map(f => (
-                                <button key={f} onClick={() => handleMoveLesson(saved.id, f)} style={{
-                                    fontSize: '0.7rem', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer',
-                                    background: saved.folder === f ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.08)',
-                                    border: '1px solid rgba(255,255,255,0.1)', color: 'inherit',
-                                }}>📁 {f}</button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
-                    <button className="btn" style={{ fontSize: '0.7rem', padding: '0.3rem 0.5rem', background: 'rgba(255,255,255,0.06)' }}
-                        onClick={(e) => { e.stopPropagation(); setMovingLessonId(isMoving ? null : saved.id); }} title="Move to folder">📁</button>
-                    <button className="btn" style={{ fontSize: '0.7rem', padding: '0.3rem 0.5rem', background: 'rgba(255,255,255,0.06)' }}
-                        onClick={(e) => handleStartRename(saved, e)} title="Rename">✏️</button>
-                    <button className="btn" style={{ fontSize: '0.7rem', padding: '0.3rem 0.5rem' }}
-                        onClick={(e) => { e.stopPropagation(); handleResumeLesson(saved); }}>
-                        {saved.isComplete ? 'Review' : 'Resume'}
-                    </button>
-                    <button className="btn" style={{ fontSize: '0.7rem', padding: '0.3rem 0.45rem', background: 'rgba(239,68,68,0.15)', color: '#fca5a5' }}
-                        onClick={(e) => handleDeleteLesson(saved.id, e)}>✕</button>
-                </div>
+                            }}>📁 {f}</button>
+                        ))}
+                    </div>
+                )}
             </div>
         );
     };
@@ -193,25 +198,28 @@ function App() {
 
     return (
         <div className="app">
+            {/* Header — compact on mobile */}
             <header style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                marginBottom: '2rem', padding: '1rem', borderBottom: '1px solid var(--glass-border)',
+                marginBottom: '1rem', padding: '0.5rem 0', borderBottom: '1px solid var(--glass-border)',
+                flexWrap: 'wrap', gap: '0.5rem',
             }}>
                 <h1 style={{
-                    margin: 0, background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+                    margin: 0, fontSize: 'clamp(1.2rem, 5vw, 2rem)',
+                    background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     cursor: apiKey ? 'pointer' : 'default',
                 }} onClick={() => apiKey && goToMenu()}>
                     Exhaustive<span style={{ fontWeight: 300 }}>Learn</span>
                 </h1>
                 {apiKey && view !== 'api-key' && (
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
                         {view !== 'menu' && (
-                            <button className="btn" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.8rem' }} onClick={goToMenu}>← Menu</button>
+                            <button className="btn" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.75rem', padding: '0.4rem 0.7rem' }} onClick={goToMenu}>← Menu</button>
                         )}
-                        <button className="btn" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.8rem' }}
+                        <button className="btn" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.75rem', padding: '0.4rem 0.7rem' }}
                             onClick={() => { localStorage.removeItem('openai_api_key'); setApiKey(''); setView('api-key'); }}>
-                            Clear API Key
+                            🔑 Clear
                         </button>
                     </div>
                 )}
@@ -222,16 +230,16 @@ function App() {
 
                 {view === 'menu' && (
                     <div style={{ width: '100%', maxWidth: '48rem', margin: '0 auto' }}>
-                        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                             <button className="btn" style={{
-                                flex: 1, padding: '1rem', fontSize: '1rem',
+                                flex: 1, padding: '0.85rem', fontSize: '0.9rem',
                                 background: 'linear-gradient(135deg, rgba(59,130,246,0.3), rgba(139,92,246,0.3))',
                                 border: '1px solid rgba(59,130,246,0.4)',
                             }} onClick={() => setView('upload')}>
-                                📄 Upload New Lecture
+                                📄 Upload Lecture
                             </button>
                             <button className="btn" style={{
-                                padding: '1rem 1.25rem', fontSize: '1rem',
+                                padding: '0.85rem 1rem', fontSize: '0.9rem',
                                 background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
                             }} onClick={() => setShowNewFolder(true)}>
                                 📁+
@@ -239,19 +247,19 @@ function App() {
                         </div>
 
                         {showNewFolder && (
-                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                                <input autoFocus placeholder="New folder name (e.g. COMP1000)"
+                            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem' }}>
+                                <input autoFocus placeholder="Folder name (e.g. COMP1000)"
                                     value={newFolderName}
                                     onChange={(e) => setNewFolderName(e.target.value)}
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleCreateFolder(); if (e.key === 'Escape') { setShowNewFolder(false); setNewFolderName(''); } }}
                                     style={{
                                         flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(59,130,246,0.4)',
-                                        borderRadius: '8px', padding: '0.6rem 0.75rem', color: 'inherit', fontSize: '0.95rem', outline: 'none',
+                                        borderRadius: '8px', padding: '0.6rem 0.75rem', color: 'inherit', fontSize: '16px', outline: 'none',
                                     }}
                                 />
-                                <button className="btn" onClick={handleCreateFolder} style={{ padding: '0.6rem 1rem' }}>Create</button>
+                                <button className="btn" onClick={handleCreateFolder} style={{ padding: '0.6rem 0.8rem' }}>Create</button>
                                 <button className="btn" onClick={() => { setShowNewFolder(false); setNewFolderName(''); }}
-                                    style={{ padding: '0.6rem 0.75rem', background: 'rgba(255,255,255,0.08)' }}>Cancel</button>
+                                    style={{ padding: '0.6rem 0.6rem', background: 'rgba(255,255,255,0.08)' }}>✕</button>
                             </div>
                         )}
 
@@ -261,18 +269,18 @@ function App() {
                             const isEditingFolder = editingFolderId === folder;
 
                             return (
-                                <div key={folder} style={{ marginBottom: '1rem' }}>
+                                <div key={folder} style={{ marginBottom: '0.75rem' }}>
                                     <div
                                         onClick={() => toggleFolder(folder)}
                                         style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 0.75rem',
+                                            display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 0.6rem',
                                             cursor: 'pointer', borderRadius: '8px', background: 'rgba(255,255,255,0.04)',
-                                            border: '1px solid rgba(255,255,255,0.08)', marginBottom: isExpanded ? '0.5rem' : 0,
+                                            border: '1px solid rgba(255,255,255,0.08)', marginBottom: isExpanded ? '0.4rem' : 0,
                                             transition: 'all 0.2s',
                                         }}
                                     >
-                                        <span style={{ fontSize: '0.85rem', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
-                                        <span style={{ fontSize: '1.1rem' }}>📁</span>
+                                        <span style={{ fontSize: '0.75rem', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                                        <span style={{ fontSize: '1rem' }}>📁</span>
                                         {isEditingFolder ? (
                                             <input autoFocus value={editingFolderName}
                                                 onChange={(e) => setEditingFolderName(e.target.value)}
@@ -282,23 +290,23 @@ function App() {
                                                 style={{
                                                     background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(59,130,246,0.5)',
                                                     borderRadius: '4px', padding: '0.2rem 0.4rem', color: 'inherit',
-                                                    fontSize: '0.95rem', fontWeight: 600, outline: 'none', flex: 1,
+                                                    fontSize: '16px', fontWeight: 600, outline: 'none', flex: 1,
                                                 }}
                                             />
                                         ) : (
-                                            <span style={{ fontWeight: 600, fontSize: '0.95rem', flex: 1 }}>{folder}</span>
+                                            <span style={{ fontWeight: 600, fontSize: '0.9rem', flex: 1 }}>{folder}</span>
                                         )}
-                                        <span style={{ fontSize: '0.75rem', opacity: 0.4 }}>{folderLessons.length} lesson{folderLessons.length !== 1 ? 's' : ''}</span>
-                                        <button className="btn" style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem', background: 'rgba(255,255,255,0.06)' }}
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.4 }}>{folderLessons.length}</span>
+                                        <button className="btn" style={{ fontSize: '0.6rem', padding: '0.25rem 0.35rem', background: 'rgba(255,255,255,0.06)', minWidth: '28px' }}
                                             onClick={(e) => { e.stopPropagation(); setEditingFolderId(folder); setEditingFolderName(folder); }} title="Rename">✏️</button>
-                                        <button className="btn" style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem', background: 'rgba(239,68,68,0.1)', color: '#fca5a5' }}
-                                            onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }} title="Delete folder">✕</button>
+                                        <button className="btn" style={{ fontSize: '0.6rem', padding: '0.25rem 0.35rem', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', minWidth: '28px' }}
+                                            onClick={(e) => { e.stopPropagation(); handleDeleteFolder(folder); }} title="Delete">✕</button>
                                     </div>
 
                                     {isExpanded && (
-                                        <div style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <div style={{ paddingLeft: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                                             {folderLessons.length === 0 && (
-                                                <p style={{ opacity: 0.3, fontSize: '0.85rem', padding: '0.5rem 0' }}>No lessons in this folder yet</p>
+                                                <p style={{ opacity: 0.3, fontSize: '0.8rem', padding: '0.4rem 0' }}>Empty folder</p>
                                             )}
                                             {folderLessons.map(renderLessonCard)}
                                         </div>
@@ -308,18 +316,18 @@ function App() {
                         })}
 
                         {unfiledLessons.length > 0 && (
-                            <div style={{ marginTop: folders.length > 0 ? '1.5rem' : 0 }}>
+                            <div style={{ marginTop: folders.length > 0 ? '1rem' : 0 }}>
                                 {folders.length > 0 && (
-                                    <h3 style={{ fontSize: '0.9rem', opacity: 0.4, marginBottom: '0.75rem', fontWeight: 500 }}>Unfiled</h3>
+                                    <h3 style={{ fontSize: '0.8rem', opacity: 0.4, marginBottom: '0.5rem', fontWeight: 500 }}>Unfiled</h3>
                                 )}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                                     {unfiledLessons.map(renderLessonCard)}
                                 </div>
                             </div>
                         )}
 
                         {savedLessons.length === 0 && folders.length === 0 && (
-                            <p style={{ textAlign: 'center', opacity: 0.4, marginTop: '2rem' }}>
+                            <p style={{ textAlign: 'center', opacity: 0.4, marginTop: '2rem', fontSize: '0.9rem' }}>
                                 No saved lessons yet. Upload a lecture to get started!
                             </p>
                         )}
@@ -330,9 +338,9 @@ function App() {
 
                 {view === 'generating' && (
                     <div style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <h2 style={{ margin: 0 }}>Learning: {filename}</h2>
-                        </div>
+                        <h2 style={{ margin: '0 0 0.75rem', fontSize: 'clamp(1rem, 4vw, 1.5rem)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            Learning: {filename}
+                        </h2>
                         <LearningInterface extractedText={extractedText} apiKey={apiKey} filename={filename} />
                     </div>
                 )}

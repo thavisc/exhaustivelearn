@@ -20,16 +20,20 @@ export const Explanation: React.FC<ExplanationProps> = ({ step, onComplete }) =>
     }, [onComplete]);
 
     return (
-        <div className="glass-panel" style={{ padding: '2rem', maxWidth: '42rem', width: '100%', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '42rem', width: '100%', margin: '0 auto' }}>
+            <h2 style={{
+                fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 'bold', marginBottom: '0.75rem',
+                background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>
                 {step.title}
             </h2>
-            <div style={{ lineHeight: 1.8, marginBottom: '2rem' }}>
+            <div style={{ lineHeight: 1.7, marginBottom: '1.5rem', fontSize: 'clamp(0.85rem, 3.5vw, 1rem)' }}>
                 <ReactMarkdown>{step.content}</ReactMarkdown>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button className="btn" onClick={onComplete}>
-                    Next Step <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '0.5rem' }}>Space</span>
+                <button className="btn" onClick={onComplete} style={{ padding: '0.6rem 1.25rem' }}>
+                    Next →
                 </button>
             </div>
         </div>

@@ -42,11 +42,13 @@ export const Quiz: React.FC<QuizProps> = ({ step, onComplete }) => {
 
     const getOptionStyle = (idx: number): React.CSSProperties => {
         const base: React.CSSProperties = {
-            padding: '1rem', paddingLeft: '1.25rem', borderRadius: '8px', textAlign: 'left',
+            padding: 'clamp(0.7rem, 2.5vw, 1rem)', paddingLeft: 'clamp(0.8rem, 3vw, 1.25rem)',
+            borderRadius: '8px', textAlign: 'left',
             transition: 'all 0.2s', cursor: isSubmitted ? 'default' : 'pointer',
             border: '1px solid transparent', background: 'rgba(0,0,0,0.2)',
-            color: 'inherit', width: '100%', fontSize: '1rem',
-            display: 'flex', alignItems: 'center', gap: '0.75rem',
+            color: 'inherit', width: '100%', fontSize: 'clamp(0.85rem, 3.5vw, 1rem)',
+            display: 'flex', alignItems: 'center', gap: '0.6rem',
+            touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
         };
         if (isSubmitted) {
             if (idx === step.correctAnswerIndex) return { ...base, background: 'rgba(34, 197, 94, 0.2)', borderColor: '#22c55e' };
@@ -58,18 +60,18 @@ export const Quiz: React.FC<QuizProps> = ({ step, onComplete }) => {
     };
 
     return (
-        <div className="glass-panel" style={{ padding: '2rem', maxWidth: '42rem', width: '100%', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>{step.title}</h2>
-            <div style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>
+        <div className="glass-panel" style={{ padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '42rem', width: '100%', margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(1rem, 3.5vw, 1.25rem)', fontWeight: 'bold', marginBottom: '0.75rem' }}>{step.title}</h2>
+            <div style={{ marginBottom: '1rem', fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)' }}>
                 <ReactMarkdown>{step.question}</ReactMarkdown>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                 {step.options.map((option, idx) => (
                     <button key={idx} onClick={() => !isSubmitted && setSelectedOption(idx)} style={getOptionStyle(idx)} disabled={isSubmitted}>
                         <span style={{
                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            width: '24px', height: '24px', borderRadius: '6px', fontSize: '0.75rem',
+                            width: '22px', height: '22px', borderRadius: '6px', fontSize: '0.7rem',
                             fontWeight: 700, flexShrink: 0,
                             background: selectedOption === idx ? 'rgba(59,130,246,0.4)' : 'rgba(255,255,255,0.1)',
                             border: '1px solid rgba(255,255,255,0.15)',
@@ -83,24 +85,24 @@ export const Quiz: React.FC<QuizProps> = ({ step, onComplete }) => {
 
             {isSubmitted && (
                 <div style={{
-                    padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem',
+                    padding: 'clamp(0.75rem, 3vw, 1rem)', borderRadius: '8px', marginBottom: '1rem',
                     background: isCorrect ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
                 }}>
-                    <h4 style={{ fontWeight: 'bold', color: isCorrect ? '#22c55e' : '#ef4444', marginBottom: '0.5rem' }}>
+                    <h4 style={{ fontWeight: 'bold', color: isCorrect ? '#22c55e' : '#ef4444', marginBottom: '0.3rem', fontSize: '0.9rem' }}>
                         {isCorrect ? '✅ Correct!' : '❌ Incorrect'}
                     </h4>
-                    <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>{step.explanation}</p>
+                    <p style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)', opacity: 0.8 }}>{step.explanation}</p>
                 </div>
             )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 {!isSubmitted ? (
-                    <button className="btn" onClick={handleSubmit} disabled={selectedOption === null}>
-                        Submit <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '0.5rem' }}>Space</span>
+                    <button className="btn" onClick={handleSubmit} disabled={selectedOption === null} style={{ padding: '0.6rem 1.25rem' }}>
+                        Submit
                     </button>
                 ) : (
-                    <button className="btn" onClick={onComplete}>
-                        Continue <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '0.5rem' }}>Space</span>
+                    <button className="btn" onClick={onComplete} style={{ padding: '0.6rem 1.25rem' }}>
+                        Continue →
                     </button>
                 )}
             </div>

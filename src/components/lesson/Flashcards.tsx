@@ -66,36 +66,45 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ step, onComplete }) => {
     return (
         <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center',
-            padding: '1.5rem', width: '100%', maxWidth: '42rem', margin: '0 auto',
+            padding: 'clamp(0.75rem, 3vw, 1.5rem)', width: '100%', maxWidth: '42rem', margin: '0 auto',
         }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '0.5rem' }}>
+            <h2 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 'bold', textAlign: 'center', marginBottom: '0.3rem' }}>
                 {step.title}
             </h2>
-            <p style={{ opacity: 0.5, fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                {totalRemaining} card{totalRemaining !== 1 ? 's' : ''} remaining
+            <p style={{ opacity: 0.5, fontSize: '0.8rem', marginBottom: '1rem' }}>
+                {totalRemaining} card{totalRemaining !== 1 ? 's' : ''} left
             </p>
 
-            <div onClick={flip} style={{ perspective: '1000px', width: '100%', height: '280px', cursor: 'pointer', marginBottom: '2rem' }}>
+            {/* Card */}
+            <div onClick={flip} style={{
+                perspective: '1000px', width: '100%',
+                height: 'clamp(180px, 40vw, 280px)',
+                cursor: 'pointer', marginBottom: '1.5rem',
+            }}>
                 <div style={{
                     position: 'relative', width: '100%', height: '100%',
                     transition: 'transform 0.5s', transformStyle: 'preserve-3d',
                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
                 }}>
+                    {/* Front */}
                     <div className="glass-panel" style={{
                         position: 'absolute', width: '100%', height: '100%', backfaceVisibility: 'hidden',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        padding: '2rem', textAlign: 'center', fontSize: '1.4rem', fontWeight: 'bold',
+                        padding: 'clamp(1rem, 3vw, 2rem)', textAlign: 'center',
+                        fontSize: 'clamp(1rem, 4vw, 1.4rem)', fontWeight: 'bold',
                         overflow: 'auto', boxSizing: 'border-box',
                     }}>
                         <span>{currentCard.front}</span>
-                        <span style={{ position: 'absolute', bottom: '0.75rem', fontSize: '0.7rem', opacity: 0.4 }}>
-                            Press Space to flip
+                        <span style={{ position: 'absolute', bottom: '0.5rem', fontSize: '0.65rem', opacity: 0.4 }}>
+                            Tap to flip
                         </span>
                     </div>
+                    {/* Back */}
                     <div className="glass-panel" style={{
                         position: 'absolute', width: '100%', height: '100%', backfaceVisibility: 'hidden',
                         transform: 'rotateY(180deg)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        padding: '2rem', textAlign: 'center', fontSize: '1.1rem',
+                        padding: 'clamp(1rem, 3vw, 2rem)', textAlign: 'center',
+                        fontSize: 'clamp(0.85rem, 3.5vw, 1.1rem)',
                         background: 'rgba(59, 130, 246, 0.12)', overflow: 'auto', boxSizing: 'border-box',
                     }}>
                         <span>{currentCard.back}</span>
@@ -103,33 +112,36 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ step, onComplete }) => {
                 </div>
             </div>
 
+            {/* Action buttons */}
             {isFlipped ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', position: 'relative', zIndex: 100 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', maxWidth: '320px' }}>
                     <button onClick={(e) => { e.stopPropagation(); markAgain(); }} style={{
-                        background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)',
-                        color: '#fca5a5', padding: '0.75rem 2rem', borderRadius: '10px',
-                        cursor: 'pointer', fontSize: '1rem', fontWeight: 600,
+                        flex: 1, background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)',
+                        color: '#fca5a5', padding: '0.7rem', borderRadius: '10px',
+                        cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600,
+                        touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
                     }}>
-                        Again <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '0.5rem' }}>1</span>
+                        Again
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); markDone(); }} style={{
-                        background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)',
-                        color: '#86efac', padding: '0.75rem 2rem', borderRadius: '10px',
-                        cursor: 'pointer', fontSize: '1rem', fontWeight: 600,
+                        flex: 1, background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)',
+                        color: '#86efac', padding: '0.7rem', borderRadius: '10px',
+                        cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600,
+                        touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
                     }}>
-                        Done <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '0.5rem' }}>2</span>
+                        Done ✓
                     </button>
                 </div>
             ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative', zIndex: 100 }}>
-                    <button onClick={(e) => { e.stopPropagation(); flip(); }} style={{
-                        background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)',
-                        color: '#93c5fd', padding: '0.75rem 2.5rem', borderRadius: '10px',
-                        cursor: 'pointer', fontSize: '1rem', fontWeight: 600,
-                    }}>
-                        Show Answer <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '0.5rem' }}>Space</span>
-                    </button>
-                </div>
+                <button onClick={(e) => { e.stopPropagation(); flip(); }} style={{
+                    background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)',
+                    color: '#93c5fd', padding: '0.7rem 2rem', borderRadius: '10px',
+                    cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600,
+                    touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
+                    width: '100%', maxWidth: '320px',
+                }}>
+                    Show Answer
+                </button>
             )}
         </div>
     );

@@ -42,30 +42,31 @@ export const LessonRunner: React.FC<LessonRunnerProps> = ({
         return (
             <div style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                justifyContent: 'center', height: '100%', textAlign: 'center', padding: '2rem',
+                justifyContent: 'center', textAlign: 'center', padding: '2rem 1rem',
+                minHeight: '60vh',
             }}>
-                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
+                <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🎉</div>
                 <h2 style={{
-                    fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem',
+                    fontSize: 'clamp(1.3rem, 5vw, 2rem)', fontWeight: 'bold', marginBottom: '0.75rem',
                     background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                 }}>
                     Lesson Complete!
                 </h2>
-                <p style={{ fontSize: '1.2rem', opacity: 0.7, marginBottom: '2rem' }}>
-                    You have successfully completed {lesson.title}.
+                <p style={{ fontSize: '1rem', opacity: 0.7, marginBottom: '1.5rem' }}>
+                    You completed <strong style={{ color: '#93c5fd' }}>{lesson.title}</strong>
                 </p>
-                <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem', maxWidth: '400px', width: '100%' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <span>Steps Completed</span>
+                <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1.5rem', maxWidth: '320px', width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.9rem' }}>
+                        <span>Steps</span>
                         <span style={{ fontWeight: 'bold' }}>{lesson.steps.length}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                         <span>Status</span>
-                        <span style={{ color: '#22c55e', fontWeight: 'bold' }}>Mastered</span>
+                        <span style={{ color: '#22c55e', fontWeight: 'bold' }}>✅ Mastered</span>
                     </div>
                 </div>
-                <button className="btn" style={{ fontSize: '1.1rem', padding: '0.75rem 2rem' }} onClick={onExit}>
+                <button className="btn" style={{ fontSize: '1rem', padding: '0.7rem 2rem' }} onClick={onExit}>
                     Return to Menu
                 </button>
             </div>
@@ -76,36 +77,36 @@ export const LessonRunner: React.FC<LessonRunnerProps> = ({
     const progress = ((currentStepIndex + 1) / lesson.steps.length) * 100;
 
     return (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: '70vh' }}>
-            {/* Progress Bar + Back Button */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: '70dvh' }}>
+            {/* Progress bar + back */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <button onClick={handleBack} disabled={currentStepIndex === 0} style={{
                     background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
                     color: currentStepIndex === 0 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)',
-                    padding: '0.35rem 0.75rem', borderRadius: '6px',
+                    padding: '0.3rem 0.6rem', borderRadius: '6px',
                     cursor: currentStepIndex === 0 ? 'not-allowed' : 'pointer',
-                    fontSize: '0.85rem', fontWeight: 600, flexShrink: 0, transition: 'all 0.2s',
+                    fontSize: '0.8rem', fontWeight: 600, flexShrink: 0, transition: 'all 0.2s',
+                    touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
                 }}>
-                    ← Back
+                    ←
                 </button>
                 <div style={{
-                    flex: 1, background: 'rgba(255,255,255,0.1)', height: '6px',
-                    borderRadius: '3px', overflow: 'hidden',
+                    flex: 1, background: 'rgba(255,255,255,0.1)', height: '4px',
+                    borderRadius: '2px', overflow: 'hidden',
                 }}>
                     <div style={{
                         background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
                         height: '100%', width: `${progress}%`,
-                        transition: 'width 0.5s ease', borderRadius: '3px',
+                        transition: 'width 0.5s ease', borderRadius: '2px',
                     }} />
                 </div>
+                <span style={{ fontSize: '0.7rem', opacity: 0.4, flexShrink: 0, fontFamily: 'monospace' }}>
+                    {currentStepIndex + 1}/{lesson.steps.length}
+                </span>
             </div>
 
             <div key={currentStep.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 {renderStep(currentStep, handleNext)}
-            </div>
-
-            <div style={{ marginTop: '2rem', textAlign: 'center', opacity: 0.4, fontSize: '0.8rem' }}>
-                Step {currentStepIndex + 1} of {lesson.steps.length} • {lesson.title}
             </div>
         </div>
     );
