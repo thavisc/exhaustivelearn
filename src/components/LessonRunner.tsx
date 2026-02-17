@@ -116,7 +116,16 @@ export const LessonRunner: React.FC<LessonRunnerProps> = ({
 
 const renderStep = (step: LessonStep, onComplete: () => void) => {
     // Normalize: GPT sometimes uses underscores or spaces instead of hyphens
-    const type = step.type.replace(/[_ ]/g, '-').toLowerCase();
+    const raw = step.type.replace(/[_ ]/g, '-').toLowerCase();
+    // Map GPT-invented types to closest real type
+    const typeAliases: Record<string, string> = {
+        'final-review': 'explanation', 'review': 'explanation', 'summary': 'explanation',
+        'multiple-choice': 'quiz', 'mcq': 'quiz',
+        'match': 'matching', 'drag-and-drop': 'matching',
+        'fill-in-the-blanks': 'fill-in-the-blank', 'fill-blank': 'fill-in-the-blank', 'cloze': 'fill-in-the-blank',
+        'free-response': 'short-answer', 'long-answer': 'short-answer', 'open-ended': 'short-answer',
+    };
+    const type = typeAliases[raw] || raw;
 
     switch (type) {
         case 'explanation': return <Explanation step={step as any} onComplete={onComplete} />;
