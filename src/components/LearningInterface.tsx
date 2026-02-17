@@ -97,7 +97,7 @@ ${extractedText.substring(0, 80000)}
                 const generatedLesson: Lesson = JSON.parse(content);
                 setLesson(generatedLesson);
 
-                const id = saveLesson(generatedLesson, filename, cost);
+                const id = saveLesson(generatedLesson, filename, cost, extractedText);
                 setLessonId(id);
 
             } catch (err: any) {

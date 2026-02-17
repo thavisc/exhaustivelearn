@@ -9,6 +9,7 @@ export interface SavedLesson {
     displayName: string;
     folder: string | null;
     cost: number | null;
+    sourceText: string | null;
     currentStepIndex: number;
     isComplete: boolean;
     createdAt: number;
@@ -25,6 +26,7 @@ function loadAll(): SavedLesson[] {
             displayName: l.displayName || l.lesson?.title || 'Untitled',
             cost: l.cost ?? null,
             folder: l.folder ?? null,
+            sourceText: l.sourceText ?? null,
         }));
     } catch {
         return [];
@@ -88,7 +90,7 @@ export function getSavedLessons(): SavedLesson[] {
     return loadAll().sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-export function saveLesson(lesson: Lesson, filename: string, cost: number | null): string {
+export function saveLesson(lesson: Lesson, filename: string, cost: number | null, sourceText: string | null = null): string {
     const all = loadAll();
     const id = `lesson_${Date.now()}`;
     const displayName = filename.replace(/\.[^/.]+$/, '');
@@ -98,6 +100,7 @@ export function saveLesson(lesson: Lesson, filename: string, cost: number | null
         displayName,
         folder: null,
         cost,
+        sourceText,
         currentStepIndex: 0,
         isComplete: false,
         createdAt: Date.now(),
@@ -105,6 +108,12 @@ export function saveLesson(lesson: Lesson, filename: string, cost: number | null
     });
     saveAll(all);
     return id;
+}
+
+export function getLectureText(id: string): string | null {
+    const all = loadAll();
+    const entry = all.find(l => l.id === id);
+    return entry?.sourceText ?? null;
 }
 
 export function renameLesson(id: string, newName: string) {

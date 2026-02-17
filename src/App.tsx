@@ -3,6 +3,7 @@ import { ApiKeyInput } from './components/ApiKeyInput';
 import { FileUpload } from './components/FileUpload';
 import { LearningInterface } from './components/LearningInterface';
 import { LessonRunner } from './components/LessonRunner';
+import { Chatbot } from './components/Chatbot';
 import {
     getSavedLessons, deleteLesson, renameLesson, updateProgress, markComplete,
     getFolders, createFolder, renameFolder, deleteFolder, moveLessonToFolder,
@@ -357,6 +358,14 @@ function App() {
                     </div>
                 )}
             </main>
+
+            {/* Chatbot — visible during lesson generation or lesson playback */}
+            {view === 'generating' && extractedText && (
+                <Chatbot apiKey={apiKey} lectureText={extractedText} />
+            )}
+            {view === 'resuming' && activeLesson?.sourceText && (
+                <Chatbot apiKey={apiKey} lectureText={activeLesson.sourceText} />
+            )}
         </div>
     );
 }

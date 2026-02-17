@@ -114,7 +114,7 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
                 {step.title}
             </h2>
             <p style={{ textAlign: 'center', marginBottom: '1rem', opacity: 0.6, fontSize: '0.8rem' }}>
-                Tap or press letter keys to match pairs
+                Tap or press number keys to match pairs
             </p>
 
             <div style={{
