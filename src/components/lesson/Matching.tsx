@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { MatchingStep } from '../../types/lesson';
 
 interface MatchingProps {
@@ -6,24 +6,36 @@ interface MatchingProps {
     onComplete: () => void;
 }
 
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
-    const [items, setItems] = useState<{ id: string; text: string; type: 'left' | 'right' }[]>([]);
+    const [items, setItems] = useState<{ id: string; text: string; type: 'left' | 'right'; letter: string }[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
+    const [wrongPair, setWrongPair] = useState<[string, string] | null>(null);
 
     useEffect(() => {
-        const lefts = step.pairs.map((p, i) => ({ id: `L-${i}`, text: p.left, type: 'left' as const }));
-        const rights = step.pairs.map((p, i) => ({ id: `R-${i}`, text: p.right, type: 'right' as const }));
+        const lefts = step.pairs.map((p, i) => ({ id: `L-${i}`, text: p.left, type: 'left' as const, letter: '' }));
+        const rights = step.pairs.map((p, i) => ({ id: `R-${i}`, text: p.right, type: 'right' as const, letter: '' }));
         const shuffled = [...lefts, ...rights].sort(() => Math.random() - 0.5);
+        // Assign letters
+        shuffled.forEach((item, i) => { item.letter = LETTERS[i] || ''; });
         setItems(shuffled);
     }, [step]);
 
-    const handleSelect = (id: string) => {
+    const handleSelect = useCallback((id: string) => {
         if (matchedIds.has(id)) return;
+        setWrongPair(null);
 
         if (!selectedId) {
             setSelectedId(id);
         } else {
+            if (selectedId === id) {
+                // Deselect if same item clicked
+                setSelectedId(null);
+                return;
+            }
+
             const first = items.find(i => i.id === selectedId);
             const second = items.find(i => i.id === id);
 
@@ -32,15 +44,67 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
                 const secondIdx = second.id.split('-')[1];
 
                 if (firstIdx === secondIdx) {
+                    // Correct match
                     const newMatched = new Set([...matchedIds, first.id, second.id]);
                     setMatchedIds(newMatched);
                     if (newMatched.size === items.length) {
                         setTimeout(onComplete, 800);
                     }
+                } else {
+                    // Wrong match — flash red briefly
+                    setWrongPair([first.id, second.id]);
+                    setTimeout(() => setWrongPair(null), 600);
                 }
+            } else if (first && second && first.type === second.type) {
+                // Same type — flash briefly
+                setWrongPair([first.id, second.id]);
+                setTimeout(() => setWrongPair(null), 600);
             }
             setSelectedId(null);
         }
+    }, [selectedId, items, matchedIds, onComplete]);
+
+    // Keyboard shortcuts: press a letter to select/match
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            const key = e.key.toUpperCase();
+            const item = items.find(i => i.letter === key && !matchedIds.has(i.id));
+            if (item) {
+                e.preventDefault();
+                handleSelect(item.id);
+            }
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [items, matchedIds, handleSelect]);
+
+    const getItemStyle = (item: { id: string; letter: string }): React.CSSProperties => {
+        const isMatched = matchedIds.has(item.id);
+        const isSelected = selectedId === item.id;
+        const isWrong = wrongPair?.includes(item.id);
+
+        const base: React.CSSProperties = {
+            padding: 'clamp(0.6rem, 2.5vw, 1rem)', borderRadius: '8px',
+            fontSize: 'clamp(0.75rem, 3vw, 0.9rem)', fontWeight: 500,
+            transition: 'all 0.2s', cursor: isMatched ? 'default' : 'pointer',
+            border: '1px solid transparent', color: 'inherit',
+            pointerEvents: isMatched ? 'none' : 'auto',
+            touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
+            textAlign: 'center' as const, wordBreak: 'break-word' as const,
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            justifyContent: 'center', position: 'relative' as const,
+        };
+
+        if (isMatched) {
+            return { ...base, opacity: 0.25, background: 'rgba(34, 197, 94, 0.15)', borderColor: 'rgba(34,197,94,0.3)' };
+        }
+        if (isWrong) {
+            return { ...base, background: 'rgba(239, 68, 68, 0.3)', borderColor: '#ef4444', transform: 'scale(0.97)' };
+        }
+        if (isSelected) {
+            return { ...base, background: 'rgba(59, 130, 246, 0.4)', borderColor: '#3b82f6', transform: 'scale(1.03)' };
+        }
+        return { ...base, background: 'rgba(255,255,255,0.08)' };
     };
 
     return (
@@ -49,7 +113,7 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
                 {step.title}
             </h2>
             <p style={{ textAlign: 'center', marginBottom: '1rem', opacity: 0.6, fontSize: '0.8rem' }}>
-                Tap two items to match them
+                Tap or press letter keys to match pairs
             </p>
 
             <div style={{
@@ -57,27 +121,22 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(min(140px, 45%), 1fr))',
                 gap: '0.5rem',
             }}>
-                {items.map((item) => {
-                    const isMatched = matchedIds.has(item.id);
-                    const isSelected = selectedId === item.id;
-
-                    return (
-                        <button key={item.id} onClick={() => handleSelect(item.id)} style={{
-                            padding: 'clamp(0.6rem, 2.5vw, 1rem)', borderRadius: '8px',
-                            fontSize: 'clamp(0.75rem, 3vw, 0.9rem)', fontWeight: 500,
-                            transition: 'all 0.2s', cursor: isMatched ? 'default' : 'pointer',
-                            border: '1px solid transparent', color: 'inherit',
-                            opacity: isMatched ? 0.3 : 1, pointerEvents: isMatched ? 'none' : 'auto',
-                            background: isSelected ? 'rgba(59, 130, 246, 0.4)' : isMatched ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.08)',
-                            borderColor: isSelected ? '#3b82f6' : 'transparent',
-                            transform: isSelected ? 'scale(1.03)' : 'scale(1)',
-                            touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
-                            textAlign: 'center', wordBreak: 'break-word',
-                        }} disabled={isMatched}>
-                            {item.text}
-                        </button>
-                    );
-                })}
+                {items.map((item) => (
+                    <button key={item.id} onClick={() => handleSelect(item.id)} style={getItemStyle(item)} disabled={matchedIds.has(item.id)}>
+                        <span style={{
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            width: '20px', height: '20px', borderRadius: '5px', fontSize: '0.65rem',
+                            fontWeight: 700, flexShrink: 0,
+                            background: selectedId === item.id ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.12)',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            opacity: matchedIds.has(item.id) ? 0.3 : 0.7,
+                            fontFamily: 'monospace',
+                        }}>
+                            {item.letter}
+                        </span>
+                        <span>{item.text}</span>
+                    </button>
+                ))}
             </div>
         </div>
     );
