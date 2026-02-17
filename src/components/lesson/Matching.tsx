@@ -6,7 +6,7 @@ interface MatchingProps {
     onComplete: () => void;
 }
 
-const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const LETTERS = 'QWERTYUIOPASDFGHJKLZXCVBNM';
 
 export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
     const [items, setItems] = useState<{ id: string; text: string; type: 'left' | 'right'; letter: string }[]>([]);
