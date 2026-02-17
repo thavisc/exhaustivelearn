@@ -6,20 +6,22 @@ interface MatchingProps {
     onComplete: () => void;
 }
 
-const LETTERS = 'QWERTYUIOPASDFGHJKLZXCVBNM';
+const KEYS = '12345678';
 
 export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
-    const [items, setItems] = useState<{ id: string; text: string; type: 'left' | 'right'; letter: string }[]>([]);
+    const [items, setItems] = useState<{ id: string; text: string; type: 'left' | 'right'; key: string }[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
     const [wrongPair, setWrongPair] = useState<[string, string] | null>(null);
 
     useEffect(() => {
-        const lefts = step.pairs.map((p, i) => ({ id: `L-${i}`, text: p.left, type: 'left' as const, letter: '' }));
-        const rights = step.pairs.map((p, i) => ({ id: `R-${i}`, text: p.right, type: 'right' as const, letter: '' }));
+        // Cap at 4 pairs (8 tiles) so number keys 1-8 always work
+        const pairs = step.pairs.slice(0, 4);
+        const lefts = pairs.map((p, i) => ({ id: `L-${i}`, text: p.left, type: 'left' as const, key: '' }));
+        const rights = pairs.map((p, i) => ({ id: `R-${i}`, text: p.right, type: 'right' as const, key: '' }));
         const shuffled = [...lefts, ...rights].sort(() => Math.random() - 0.5);
-        // Assign letters
-        shuffled.forEach((item, i) => { item.letter = LETTERS[i] || ''; });
+        // Assign number keys
+        shuffled.forEach((item, i) => { item.key = KEYS[i] || ''; });
         setItems(shuffled);
     }, [step]);
 
@@ -67,8 +69,7 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
     // Keyboard shortcuts: press a letter to select/match
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
-            const key = e.key.toUpperCase();
-            const item = items.find(i => i.letter === key && !matchedIds.has(i.id));
+            const item = items.find(i => i.key === e.key && !matchedIds.has(i.id));
             if (item) {
                 e.preventDefault();
                 handleSelect(item.id);
@@ -78,7 +79,7 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
         return () => window.removeEventListener('keydown', handleKey);
     }, [items, matchedIds, handleSelect]);
 
-    const getItemStyle = (item: { id: string; letter: string }): React.CSSProperties => {
+    const getItemStyle = (item: { id: string; key: string }): React.CSSProperties => {
         const isMatched = matchedIds.has(item.id);
         const isSelected = selectedId === item.id;
         const isWrong = wrongPair?.includes(item.id);
@@ -125,14 +126,14 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
                     <button key={item.id} onClick={() => handleSelect(item.id)} style={getItemStyle(item)} disabled={matchedIds.has(item.id)}>
                         <span style={{
                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            width: '20px', height: '20px', borderRadius: '5px', fontSize: '0.65rem',
+                            width: '20px', height: '20px', borderRadius: '5px', fontSize: '0.7rem',
                             fontWeight: 700, flexShrink: 0,
                             background: selectedId === item.id ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.12)',
                             border: '1px solid rgba(255,255,255,0.15)',
                             opacity: matchedIds.has(item.id) ? 0.3 : 0.7,
                             fontFamily: 'monospace',
                         }}>
-                            {item.letter}
+                            {item.key}
                         </span>
                         <span>{item.text}</span>
                     </button>
