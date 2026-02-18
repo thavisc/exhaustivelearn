@@ -49,7 +49,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ apiKey, lectureText }) => {
         try {
             // Build conversation with lecture context
             const contextText = lectureText.substring(0, 60000);
-            const systemPrompt = `You are a helpful study assistant. You ONLY answer questions using the lecture material provided below. If a question is not covered by the lecture material, say "This topic isn't covered in the lecture material." Be concise but thorough. Use markdown formatting when helpful.
+            const systemPrompt = `You are a helpful study assistant. You have access to the student's lecture material below, which you should use as primary context when relevant. You can also draw on your general knowledge to answer questions, explain concepts further, or provide additional examples beyond the lecture. Be concise but thorough. Use markdown formatting when helpful.
 
 ## LECTURE MATERIAL:
 ${contextText}`;
@@ -189,7 +189,7 @@ ${contextText}`;
                         <span style={{ fontSize: '1.1rem' }}>🤖</span>
                         <div>
                             <div style={{ fontWeight: 600, fontSize: '0.85rem', color: '#e2e8f0' }}>Lecture Assistant</div>
-                            <div style={{ fontSize: '0.65rem', opacity: 0.4 }}>Answers from your lecture only</div>
+                            <div style={{ fontSize: '0.65rem', opacity: 0.4 }}>Your study assistant</div>
                         </div>
                     </div>
 
