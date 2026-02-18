@@ -69,6 +69,8 @@ export const Matching: React.FC<MatchingProps> = ({ step, onComplete }) => {
     // Keyboard shortcuts: press a letter to select/match
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
             const item = items.find(i => i.key === e.key && !matchedIds.has(i.id));
             if (item) {
                 e.preventDefault();

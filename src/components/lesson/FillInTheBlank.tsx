@@ -33,6 +33,8 @@ export const FillInTheBlank: React.FC<FillInTheBlankProps> = ({ step, onComplete
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
             const num = parseInt(e.key);
             if (num >= 1 && num <= Math.min(4, shuffledOptions.length) && !isSubmitted) {
                 e.preventDefault();

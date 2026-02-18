@@ -43,7 +43,8 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({ step, onComplete }) =>
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
             // Don't trigger shortcuts while typing in textarea
-            if (document.activeElement?.tagName === 'TEXTAREA') return;
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
 
             if (e.code === 'Space') {
                 e.preventDefault();

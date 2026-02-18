@@ -46,6 +46,8 @@ export const Flashcards: React.FC<FlashcardsProps> = ({ step, onComplete }) => {
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
             if (e.code === 'Space') {
                 e.preventDefault();
                 if (!isFlipped) flip();

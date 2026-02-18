@@ -10,6 +10,8 @@ interface ExplanationProps {
 export const Explanation: React.FC<ExplanationProps> = ({ step, onComplete }) => {
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
             if (e.code === 'Space') {
                 e.preventDefault();
                 onComplete();

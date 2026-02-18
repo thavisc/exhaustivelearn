@@ -21,6 +21,8 @@ export const Quiz: React.FC<QuizProps> = ({ step, onComplete }) => {
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
+            const tag = (document.activeElement?.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return;
             const num = parseInt(e.key);
             if (num >= 1 && num <= step.options.length && !isSubmitted) {
                 e.preventDefault();
